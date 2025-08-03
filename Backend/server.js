@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import cookieparser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 
 import authRoutes from './routes/authRoutes.js';
 import noteRoutes from './routes/noteRoutes.js'
@@ -10,10 +10,14 @@ import noteRoutes from './routes/noteRoutes.js'
 dotenv.config();
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", // No /* at the end!
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(express.json());
-app.use(cookieparser())
-
+app.use(cookieParser())
 app.use("/api/auth", authRoutes);
 app.use('/api/notes', noteRoutes);
 

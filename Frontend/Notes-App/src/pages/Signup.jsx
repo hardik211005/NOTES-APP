@@ -1,16 +1,34 @@
 import React, { useState } from 'react';
-
+import {axiosInstance} from '../../axiosinstance.js'
+import { useNavigate } from 'react-router-dom';
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSignup = (e) => {
+  const navigate = useNavigate();
+
+  const handleSignup = async (e) => {
     e.preventDefault(); // page reload roke
     console.log("Username:", username);
     console.log("Email:", email);
     console.log("Password:", password);
+    const data = {
+      username,
+      email,
+      password,
+    }
     // Baad mei yahan API call aayegi
+    try{
+      const response = await axiosInstance.post("/api/auth/signup", data);
+      if (!response) throw error("NO response from axios");
+      console.log(response.data);
+      const token = response.data.token;
+      localStorage.setItem('Authorization', token);
+      navigate('/')
+    }catch (error) {
+      console.log(error); 
+    }
   };
 
   return (

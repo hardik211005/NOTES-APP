@@ -2,12 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Home = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
     setTimeout(() => setIsLoaded(true), 100);
   }, []);
 
@@ -81,47 +78,29 @@ const Home = () => {
 
             {/* Action Buttons */}
             <div className="space-y-6">
-              {isLoggedIn ? (
-                <div className="space-y-4">
-                  <Link
-                    to="/notes"
-                    className="inline-block bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-10 py-4 rounded-2xl text-lg font-semibold hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg"
-                  >
-                    <span className="flex items-center gap-3">
-                      <span>📚</span>
-                      Go to My Notes
-                      <span>→</span>
-                    </span>
-                  </Link>
-                  <p className="text-gray-400 text-sm">Welcome back! Ready to continue your work?</p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  <div className="flex flex-col sm:flex-row justify-center gap-4">
-                    <Link
-                      to="/login"
-                      className="group bg-gradient-to-r from-slate-700 to-gray-700 text-white px-8 py-4 rounded-2xl font-semibold hover:from-slate-600 hover:to-gray-600 transition-all duration-300 transform hover:scale-105 hover:shadow-xl shadow-lg border border-white/10"
-                    >
-                      <span className="flex items-center gap-3">
-                        <span>🔐</span>
-                        Login
-                        <span className="transform group-hover:translate-x-1 transition-transform">→</span>
-                      </span>
-                    </Link>
-                    <Link
-                      to="/signup"
-                      className="group bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-8 py-4 rounded-2xl font-semibold hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 transform hover:scale-105 hover:shadow-xl shadow-lg"
-                    >
-                      <span className="flex items-center gap-3">
-                        <span>✨</span>
-                        Get Started
-                        <span className="transform group-hover:translate-x-1 transition-transform">→</span>
-                      </span>
-                    </Link>
-                  </div>
-                  <p className="text-gray-400 text-sm">Join thousands of users organizing their thoughts daily</p>
-                </div>
-              )}
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Link
+                  to="/notes"
+                  className="group bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-8 py-4 rounded-2xl font-semibold hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 transform hover:scale-105 hover:shadow-xl shadow-lg"
+                >
+                  <span className="flex items-center gap-3">
+                    <span>✏️</span>
+                    Create a New Note
+                    <span className="transform group-hover:translate-x-1 transition-transform">→</span>
+                  </span>
+                </Link>
+                <Link
+                  to="/notes"
+                  className="group bg-gradient-to-r from-slate-700 to-gray-700 text-white px-8 py-4 rounded-2xl font-semibold hover:from-slate-600 hover:to-gray-600 transition-all duration-300 transform hover:scale-105 hover:shadow-xl shadow-lg border border-white/10"
+                >
+                  <span className="flex items-center gap-3">
+                    <span>📚</span>
+                    My Notes
+                    <span className="transform group-hover:translate-x-1 transition-transform">→</span>
+                  </span>
+                </Link>
+              </div>
+              <p className="text-gray-400 text-sm">Start organizing your thoughts and ideas today</p>
             </div>
 
             {/* Stats Section */}
