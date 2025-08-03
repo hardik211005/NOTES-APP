@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import {axiosInstance} from '../../axiosinstance'
 
 const Notes = () => {
   const [title, setTitle] = useState("");
@@ -10,11 +10,11 @@ const Notes = () => {
   const handleAddNote = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("Authorization");
 
     try {
-      await axios.post(
-        "http://localhost:4000/api/notes/create",
+      await axiosInstance.post(
+        "/api/notes/create",
         {
           title,
           content,
@@ -36,8 +36,8 @@ const Notes = () => {
 
   const fetchNotes = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:4000/api/notes/all", {
+      const token = localStorage.getItem("Authorization");
+      const res = await axiosInstance.get("/api/notes/all", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -2,7 +2,7 @@
 import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("Authorization");
   if (!token) {
     // Agar token nahi milta, login pe redirect
     return <Navigate to="/login" replace />;
