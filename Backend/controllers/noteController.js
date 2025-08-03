@@ -9,7 +9,7 @@ export const createNote = async (req, res) => {
   }
 
   try {
-    const newNote = new Note({ title, content, userId });
+    const newNote = Note.create({ title, content, userId });
     await newNote.save();
     res.status(201).json(newNote);
   } catch (err) {
