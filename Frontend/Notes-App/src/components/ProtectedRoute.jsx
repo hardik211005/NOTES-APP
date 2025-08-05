@@ -1,9 +1,11 @@
 // src/components/ProtectedRoute.jsx
 import { Navigate } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("Authorization");
-  if (!token) {
+  const { isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) {
     // Agar token nahi milta, login pe redirect
     return <Navigate to="/login" replace />;
   }

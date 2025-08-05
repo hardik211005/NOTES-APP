@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import {axiosInstance} from '../../axiosinstance.js'
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../Context/AuthContext';
+
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { login } = useAuth();
 
   const navigate = useNavigate();
 
@@ -25,6 +28,10 @@ const Signup = () => {
       console.log(response.data);
       const token = response.data.token;
       localStorage.setItem('Authorization', token);
+      
+      // Call the login function from AuthContext
+      login(token, response.data.user || null);
+      
       navigate('/')
     }catch (error) {
       console.log(error); 

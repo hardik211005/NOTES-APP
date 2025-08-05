@@ -6,11 +6,13 @@ const Notes = () => {
   const [content, setContent] = useState("");
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const handleAddNote = async (e) => {
     e.preventDefault();
 
     const token = localStorage.getItem("Authorization");
+    console.log("Token for adding note:", token); // Debug log
 
     try {
       await axiosInstance.post(
@@ -31,21 +33,27 @@ const Notes = () => {
       fetchNotes(); // Update UI
     } catch (err) {
       console.error("Error adding note:", err);
+      setError("Failed to add note. Please try again.");
     }
   };
 
   const fetchNotes = async () => {
     try {
+      setError(null);
       const token = localStorage.getItem("Authorization");
+      console.log("Token for fetching notes:", token); // Debug log
+      
       const res = await axiosInstance.get("/api/notes/all", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setNotes(res.data.notes);
+      setNotes(res.data.notes || []);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching notes:", err);
+      setError("Failed to load notes. Please check your connection.");
+      setNotes([]); // Ensure notes is always an array
       setLoading(false);
     }
   };
@@ -64,6 +72,19 @@ const Notes = () => {
       </div>
 
       <div className="relative z-10 p-6 max-w-7xl mx-auto">
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-center">
+            <p>{error}</p>
+            <button 
+              onClick={fetchNotes}
+              className="mt-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors duration-200"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
         {/* Add Note Form Section */}
         <div className="mb-12">
           <form onSubmit={handleAddNote} className="bg-white/5 backdrop-blur-xl p-8 rounded-3xl shadow-xl mb-12 max-w-2xl mx-auto border border-white/10">
@@ -130,7 +151,7 @@ const Notes = () => {
               Loading notes...
             </p>
           </div>
-        ) : notes.length === 0 ? (
+        ) : (notes && notes.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-12 text-center border border-white/10 shadow-xl max-w-lg mx-auto">
               <div className="text-8xl mb-6 opacity-30">📝</div>
@@ -147,7 +168,7 @@ const Notes = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {notes.map((note, index) => (
+            {notes && notes.map((note, index) => (
               <div
                 key={note._id}
                 className={`group bg-white/5 backdrop-blur-xl p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-white/10 hover:border-blue-400/30 relative overflow-hidden ${
@@ -192,7 +213,7 @@ const Notes = () => {
                 
                 <p className="text-gray-300 mb-4 leading-relaxed overflow-hidden h-20">
                   <span className="block overflow-hidden">
-                    {note.content.slice(0, 100)}...
+                    {note.content && note.content.slice(0, 100)}...
                   </span>
                 </p>
                 
@@ -201,7 +222,7 @@ const Notes = () => {
                   <div className="flex items-center space-x-2 text-sm text-gray-400">
                     <span className="text-xs">📅</span>
                     <span>
-                      {new Date(note.createdAt).toLocaleDateString()}
+                      {note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'No date'}
                     </span>
                   </div>
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -217,7 +238,7 @@ const Notes = () => {
         )}
 
         {/* Notes count indicator */}
-        {notes.length > 0 && (
+        {notes && notes.length > 0 && (
           <div className="text-center mt-12">
             <div className="inline-flex items-center space-x-2 bg-white/5 backdrop-blur-xl rounded-full px-6 py-3 shadow-xl border border-white/10">
               <span className="text-2xl">📊</span>
