@@ -7,6 +7,9 @@ const Notes = () => {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editingNote, setEditingNote] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
 
   const handleAddNote = async (e) => {
     e.preventDefault();
@@ -14,22 +17,20 @@ const Notes = () => {
     const token = localStorage.getItem("Authorization");
     console.log("Token for adding note:", token); // Debug log
 
+    if (!token) {
+      setError("No authentication token found. Please login again.");
+      return;
+    }
+
     try {
-      await axiosInstance.post(
-        "/api/notes/create",
-        {
-          title,
-          content,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await axiosInstance.post("/api/notes/create", {
+        title,
+        content,
+      });
 
       setTitle("");
       setContent("");
+      setError(null); // Clear any previous errors
       fetchNotes(); // Update UI
     } catch (err) {
       console.error("Error adding note:", err);
@@ -43,11 +44,18 @@ const Notes = () => {
       const token = localStorage.getItem("Authorization");
       console.log("Token for fetching notes:", token); // Debug log
       
-      const res = await axiosInstance.get("/api/notes/all", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      if (!token) {
+        setError("No authentication token found. Please login again.");
+        setLoading(false);
+        return;
+      }
+      
+      const res = await axiosInstance.get("/api/notes/all");
+      console.log("Notes received:", res.data.notes);
+      if (res.data.notes && res.data.notes.length > 0) {
+        console.log("First note createdAt:", res.data.notes[0].createdAt);
+        console.log("First note createdAt type:", typeof res.data.notes[0].createdAt);
+      }
       setNotes(res.data.notes || []);
       setLoading(false);
     } catch (err) {
@@ -58,9 +66,89 @@ const Notes = () => {
     }
   };
 
+  const handleEditNote = async (noteId) => {
+    console.log("handleEditNote called with noteId:", noteId);
+    console.log("editTitle:", editTitle);
+    console.log("editContent:", editContent);
+    
+    try {
+      const response = await axiosInstance.put(`/api/notes/${noteId}`, {
+        title: editTitle,
+        content: editContent,
+      });
+      
+      console.log("Edit response:", response.data);
+      setEditingNote(null);
+      setEditTitle("");
+      setEditContent("");
+      setError(null);
+      fetchNotes(); // Refresh notes
+    } catch (err) {
+      console.error("Error updating note:", err);
+      setError("Failed to update note. Please try again.");
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    console.log("handleDeleteNote called with noteId:", noteId);
+    
+    if (window.confirm("Are you sure you want to delete this note?")) {
+      try {
+        const response = await axiosInstance.delete(`/api/notes/${noteId}`);
+        console.log("Delete response:", response.data);
+        setError(null);
+        fetchNotes(); // Refresh notes
+      } catch (err) {
+        console.error("Error deleting note:", err);
+        setError("Failed to delete note. Please try again.");
+      }
+    }
+  };
+
+  const startEditing = (note) => {
+    console.log("startEditing called with note:", note);
+    setEditingNote(note._id);
+    setEditTitle(note.title);
+    setEditContent(note.content);
+  };
+
+  const cancelEditing = () => {
+    console.log("cancelEditing called");
+    setEditingNote(null);
+    setEditTitle("");
+    setEditContent("");
+  };
+
+  // Helper function to format dates
+  const formatDate = (dateString) => {
+    if (!dateString) return 'No date';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid date';
+      
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return 'Invalid date';
+    }
+  };
+
   useEffect(() => {
+    console.log("Notes component mounted");
     fetchNotes();
   }, []);
+
+  // Debug effect to log state changes
+  useEffect(() => {
+    console.log("Current editingNote:", editingNote);
+    console.log("Current editTitle:", editTitle);
+    console.log("Current editContent:", editContent);
+  }, [editingNote, editTitle, editContent]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 relative overflow-hidden">
@@ -186,7 +274,7 @@ const Notes = () => {
                   'bg-gray-400'
                 } rounded-full -translate-y-8 translate-x-8`}></div>
                 
-                {/* Note icon */}
+                {/* Note icon and action buttons */}
                 <div className="flex items-start justify-between mb-4">
                   <div className={`p-2 rounded-xl ${
                     index % 4 === 0 ? 'bg-blue-500/20 text-blue-400' :
@@ -196,12 +284,30 @@ const Notes = () => {
                   }`}>
                     <span className="text-xl">📝</span>
                   </div>
-                  <div className={`w-2 h-2 rounded-full ${
-                    index % 4 === 0 ? 'bg-blue-400' :
-                    index % 4 === 1 ? 'bg-indigo-400' :
-                    index % 4 === 2 ? 'bg-slate-400' :
-                    'bg-gray-400'
-                  } animate-pulse`}></div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => {
+                        console.log("Edit button clicked for note:", note);
+                        startEditing(note);
+                      }}
+                      className="p-2 rounded-lg bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition-colors duration-200 cursor-pointer z-10 relative"
+                      title="Edit note"
+                      style={{ pointerEvents: 'auto' }}
+                    >
+                      <span className="text-lg">✏️</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        console.log("Delete button clicked for note:", note);
+                        handleDeleteNote(note._id);
+                      }}
+                      className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors duration-200 cursor-pointer z-10 relative"
+                      title="Delete note"
+                      style={{ pointerEvents: 'auto' }}
+                    >
+                      <span className="text-lg">🗑️</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Note content */}
@@ -211,18 +317,56 @@ const Notes = () => {
                   </span>
                 </h3>
                 
-                <p className="text-gray-300 mb-4 leading-relaxed overflow-hidden h-20">
-                  <span className="block overflow-hidden">
-                    {note.content && note.content.slice(0, 100)}...
-                  </span>
-                </p>
+                {editingNote === note._id ? (
+                  <div className="mb-4 space-y-3">
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="w-full p-3 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Note title"
+                    />
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      className="w-full p-3 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none h-20"
+                      placeholder="Note content"
+                    />
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => {
+                          console.log("Save button clicked for note:", note._id);
+                          handleEditNote(note._id);
+                        }}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => {
+                          console.log("Cancel button clicked");
+                          cancelEditing();
+                        }}
+                        className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg transition-colors duration-200"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-gray-300 mb-4 leading-relaxed overflow-hidden h-20">
+                    <span className="block overflow-hidden">
+                      {note.content && note.content.slice(0, 100)}...
+                    </span>
+                  </p>
+                )}
                 
                 {/* Footer with date */}
                 <div className="flex items-center justify-between pt-4 border-t border-white/10">
                   <div className="flex items-center space-x-2 text-sm text-gray-400">
                     <span className="text-xs">📅</span>
                     <span>
-                      {note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'No date'}
+                      {formatDate(note.createdAt)}
                     </span>
                   </div>
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -231,7 +375,7 @@ const Notes = () => {
                 </div>
 
                 {/* Hover effect overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 rounded-2xl transition-all duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 rounded-2xl transition-all duration-300 pointer-events-none"></div>
               </div>
             ))}
           </div>
