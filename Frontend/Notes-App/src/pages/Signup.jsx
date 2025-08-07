@@ -58,7 +58,7 @@ const Signup = () => {
             </svg>
           </div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-1">
-            NotesApp
+            Notify
           </h1>
           <p className="text-gray-500 text-sm">Create your account to get started</p>
         </div>
@@ -71,7 +71,7 @@ const Signup = () => {
           
           <div className="relative z-10">
             <h2 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-              Join NotesApp
+              Join Notify
             </h2>
             <div className="space-y-5">
               <div className="relative">

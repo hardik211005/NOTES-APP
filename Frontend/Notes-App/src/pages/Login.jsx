@@ -56,7 +56,7 @@ const Login = () => {
             </svg>
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
-            NotesApp
+            Notify
           </h1>
           <p className="text-gray-500 text-sm">Sign in to access your notes</p>
         </div>

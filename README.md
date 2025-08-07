@@ -1,6 +1,6 @@
-# 📝 Notes App
+# 📝 Notify
 
-This is a **full-stack Notes App** built with React, Node.js, Express, and MongoDB. It supports user authentication, a public home page, and a protected notes space for creating and viewing personal notes.
+This is a **full-stack Notify** built with React, Node.js, Express, and MongoDB. It supports user authentication, a public home page, and a protected notes space for creating and viewing personal notes.
 
 ---
 

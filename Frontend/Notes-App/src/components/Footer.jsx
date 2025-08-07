@@ -28,7 +28,7 @@ const Footer = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-white via-blue-50 to-blue-100 bg-clip-text text-transparent tracking-tight drop-shadow-sm">
-                NotesApp
+                Notify
               </h1>
             </div>
           </div>
@@ -76,7 +76,7 @@ const Footer = () => {
         {/* Bottom Section - Full Width */}
         <div className="flex justify-between items-center text-sm">
           <div className="text-gray-400/90 backdrop-blur-sm">
-            <span>© {currentYear} NotesApp. All rights reserved.</span>
+            <span>© {currentYear} Notify. All rights reserved.</span>
           </div>
           
           <div className="flex items-center space-x-4">
