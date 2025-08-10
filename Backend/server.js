@@ -11,8 +11,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin:["https://notes-app-liart-six.vercel.app/" ,
-    "http://localhost:5173"],
+  origin:["https://notes-app-liart-six.vercel.app/"],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
