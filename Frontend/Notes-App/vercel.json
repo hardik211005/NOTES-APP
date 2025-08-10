@@ -1,12 +1,9 @@
 {
     "rewrites": [
       {
-        "source": "/api/(.)",
-        "destination": "/api/$1"
-      },
-      {
-        "source": "/(.)",
+        "source": "/((?!api/.)(?!_next/.)(?!.\..).*)",
         "destination": "/index.html"
       }
     ]
   }
+  
