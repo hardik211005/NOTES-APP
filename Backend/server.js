@@ -11,7 +11,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin:["https://notify-eight-pearl.vercel.app/" ,"https://notify-hardik-21.vercel.app/" ,
+  origin:["https://notes-app-liart-six.vercel.app/" ,
     "http://localhost:5173"],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
